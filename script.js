@@ -612,15 +612,14 @@ document.addEventListener('DOMContentLoaded', function () {
                     .then(files => files.some(file => file.name === fileName));
             }
 
-            function fetchTagsFile(owner, repoName) {
-                return fileExistsInRepo(owner, repoName, 'TAGS')
-                    .then(exists => {
-                        if (exists) return fetch(`https://raw.githubusercontent.com/${owner}/${repoName}/main/TAGS`)
-                            .then(response => {
-                                if (response.status === 200) return response.text();
-                            });
-                        else return null;
-                    })
+            function fetchTopics(owner, repoName) {
+                return fetch(`https://api.github.com/repos/${owner}/${repoName}/topics`, {
+                    headers: {
+                        'Accept': 'application/vnd.github.mercy-preview+json'
+                    }
+                })
+                    .then(response => response.json())
+                    .then(data => data.names);  // "names" contains the list of topics for the repository
             }
 
             function fetchImage(owner, repoName) {
@@ -748,17 +747,14 @@ document.addEventListener('DOMContentLoaded', function () {
                         });
                     });
 
-                fetchTagsFile('StormLord07', repo.name)
-                    .then(tagsContent => {
-                        if (tagsContent) {
-                            const tagsArray = tagsContent.split('\n').filter(tag => tag.trim() !== ''); // Assuming tags are newline separated
-                            tagsArray.forEach(tag => {
-                                const tagElement = document.createElement('span');
-                                tagElement.textContent = tag;
-                                tagElement.classList.add('tag');
-                                projectTags.appendChild(tagElement);
-                            });
-                        }
+
+                fetchTopics('StormLord07', repo.name)
+                    .then(topics => {
+                        topics.forEach(topic => {
+                            const tag = document.createElement('span');
+                            tag.textContent = topic;
+                            projectTags.appendChild(tag);
+                        });
                     });
 
                 projectContent.appendChild(projectTitle);
