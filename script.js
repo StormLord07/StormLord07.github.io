@@ -609,7 +609,11 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             function fetchReadme(owner, repoName) {
-                return fetch(`https://api.github.com/repos/${owner}/${repoName}/readme`)
+                return fetch(`https://api.github.com/repos/${owner}/${repoName}/readme`, {
+                    headers: {
+                        'Accept': 'application/vnd.github.VERSION.html',
+                    }
+                })
                     .then(response => response.text());
             }
 
