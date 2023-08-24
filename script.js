@@ -1,5 +1,3 @@
-const token = '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';
-
 document.addEventListener('DOMContentLoaded', function () {
     // Fetching the repositories from GitHub
     fetch('https://api.github.com/users/StormLord07/repos')
@@ -608,13 +606,42 @@ document.addEventListener('DOMContentLoaded', function () {
                     .map(language => language[0]);
             }
 
+            function fileExistsInRepo(owner, repoName, fileName) {
+                return fetch(`https://api.github.com/repos/${owner}/${repoName}/contents/`)
+                    .then(response => response.json())
+                    .then(files => files.some(file => file.name === fileName));
+            }
+
+            function fetchTagsFile(owner, repoName) {
+                return fileExistsInRepo(owner, repoName, 'TAGS')
+                    .then(exists => {
+                        if (exists) return fetch(`https://raw.githubusercontent.com/${owner}/${repoName}/main/TAGS`)
+                            .then(response => {
+                                if (response.status === 200) return response.text();
+                            });
+                        else return null;
+                    })
+            }
+
+            function fetchImage(owner, repoName) {
+                return fileExistsInRepo(owner, repoName, 'REPO-LOGO.png')
+                    .then(exists => {
+                        if (exists) return `https://raw.githubusercontent.com/${owner}/${repoName}/main/REPO-LOGO.png`;
+                        else return null;
+                    });
+            }
+
             function fetchReadme(owner, repoName) {
-                return fetch(`https://api.github.com/repos/${owner}/${repoName}/readme`, {
-                    headers: {
-                        'Accept': 'application/vnd.github.VERSION.html',
-                    }
-                })
-                    .then(response => response.text());
+                return fileExistsInRepo(owner, repoName, 'README.md')
+                    .then(exists => {
+                        if (exists) return fetch(`https://api.github.com/repos/${owner}/${repoName}/readme`, {
+                            headers: {
+                                'Accept': 'application/vnd.github.VERSION.html',
+                            }
+                        })
+                            .then(response => response.text());
+                        else return null;
+                    })
             }
 
             function truncateText(content, maxLength) {
@@ -647,15 +674,15 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
 
-            function generateSampleTags(projectTagsContainer, numberOfTags) {
-                const sampleTagNames = ['React', 'JavaScript', 'CSS', 'NodeJS', 'TypeScript', 'GraphQL', 'D3', 'Sass', 'Webpack', 'Vue'];
+            // function generateSampleTags(projectTagsContainer, numberOfTags) {
+            //     const sampleTagNames = ['React', 'JavaScript', 'CSS', 'NodeJS', 'TypeScript', 'GraphQL', 'D3', 'Sass', 'Webpack', 'Vue'];
 
-                for (let i = 0; i < numberOfTags; i++) {
-                    const tag = document.createElement('span');
-                    tag.textContent = sampleTagNames[Math.floor(Math.random() * sampleTagNames.length)];
-                    projectTagsContainer.appendChild(tag);
-                }
-            }
+            //     for (let i = 0; i < numberOfTags; i++) {
+            //         const tag = document.createElement('span');
+            //         tag.textContent = sampleTagNames[Math.floor(Math.random() * sampleTagNames.length)];
+            //         projectTagsContainer.appendChild(tag);
+            //     }
+            // }
 
             sortedRepos.forEach(repo => {
                 const projectBox = document.createElement('a');
@@ -665,6 +692,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 const projectImage = document.createElement('img');
                 projectImage.classList.add('project-image');
+                fetchImage('StormLord07', repo.name)
+                    .then(imageContent => {
+                        if (imageContent) {
+                            projectImage.src = imageContent;
+                        }
+                        else {
+                            projectImage.src = "neiroset-dlya-razrabotchikov-C.png"
+                        }
+                    });
                 projectImage.src = 'neiroset-dlya-razrabotchikov-C.png'; // Or you could use repo-specific data if available
 
                 const projectContent = document.createElement('div');
@@ -675,17 +711,22 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 fetchReadme('StormLord07', repo.name)
                     .then(content => {
-                        const cleanedContent = removeRepoNameAndChainImage(content, repo.name);
-                        const truncatedContent = truncateText(cleanedContent, 200); // Limit to 300 characters, adjust as needed
-                        const projectDescription = document.createElement('div');
-                        projectDescription.classList.add('project-description');
-                        projectDescription.innerHTML = truncatedContent;
-                        projectContent.appendChild(projectDescription);
+                        if (content) {
+                            const cleanedContent = removeRepoNameAndChainImage(content, repo.name);
+                            const truncatedContent = truncateText(cleanedContent, 200); // Limit to 300 characters, adjust as needed
+                            const projectDescription = document.createElement('div');
+                            projectDescription.classList.add('project-description');
+                            projectDescription.innerHTML = truncatedContent;
+                            projectContent.appendChild(projectDescription);
+                        }
                     });
+
+                // const projectTags = document.createElement('div');
+                // projectTags.classList.add('tags');
+                // generateSampleTags(projectTags, Math.floor(Math.random() * 8) + 20);
 
                 const projectTags = document.createElement('div');
                 projectTags.classList.add('tags');
-                generateSampleTags(projectTags, Math.floor(Math.random() * 8) + 20);
 
                 const projectLanguages = document.createElement('div');
                 projectLanguages.classList.add('languages');
@@ -694,12 +735,30 @@ document.addEventListener('DOMContentLoaded', function () {
                     .then(languages => {
                         const topLanguages = getTopLanguages(languages);
                         topLanguages.forEach(language => {
+                            const tag = document.createElement('span');
+                            tag.textContent = language;
+                            tag.classList.add('tag');
+                            tag.style.backgroundColor = "red";
+                            projectTags.appendChild(tag);
                             const languageSpan = document.createElement('span');
                             languageSpan.textContent = abbreviateLanguage(language);
                             languageSpan.classList.add('language-tag');
                             languageSpan.style.backgroundColor = languageColors[language] || "#666";
                             projectLanguages.appendChild(languageSpan); // Append to projectLanguages directly
                         });
+                    });
+
+                fetchTagsFile('StormLord07', repo.name)
+                    .then(tagsContent => {
+                        if (tagsContent) {
+                            const tagsArray = tagsContent.split('\n').filter(tag => tag.trim() !== ''); // Assuming tags are newline separated
+                            tagsArray.forEach(tag => {
+                                const tagElement = document.createElement('span');
+                                tagElement.textContent = tag;
+                                tagElement.classList.add('tag');
+                                projectTags.appendChild(tagElement);
+                            });
+                        }
                     });
 
                 projectContent.appendChild(projectTitle);

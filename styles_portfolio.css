@@ -109,7 +109,6 @@ a:hover {
     padding: 0px 10px;
     box-sizing: border-box;
     overflow-y: visible;
-    z-index: 5;
     background-color: rgba(39, 39, 39, 1);
     transition: background-color 0.3s ease;
 }
@@ -170,7 +169,6 @@ a:hover {
     top: 50%;
     left: 10px;
     transform: translateY(-50%);
-    z-index: 1;
 }
 
 .project-content h3+.languages {
