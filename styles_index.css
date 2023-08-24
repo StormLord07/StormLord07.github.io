@@ -1,0 +1,52 @@
+body {
+    font-family: 'Fira Code', monospace;
+    /* Using a coding font for the aesthetic */
+    margin: 0;
+    padding: 0;
+    background-color: #1e1e1e;
+    color: #e1e1f0;
+    line-height: 1.6;
+}
+
+header {
+    background-color: #272727;
+    padding: 20px 0;
+    text-align: center;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2.5rem;
+}
+
+nav a {
+    margin: 0 15px;
+    text-decoration: none;
+    color: #e1e1f0;
+    transition: color 0.3s ease;
+}
+
+nav a:hover {
+    color: #a5a5d5;
+}
+
+section {
+    padding: 40px 20px;
+    text-align: center;
+}
+
+footer {
+    background-color: #272727;
+    padding: 10px 0;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+a {
+    color: #a5a5d5;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: #e1e1f0;
+}
