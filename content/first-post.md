@@ -20,4 +20,4 @@ Cras accumsan a purus at facilisis. Donec tristique, ipsum eget mollis lacinia, 
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur vel urna sem.
 
-[Second part](#second-post.md)
+[Second part](#content/second-post.md)

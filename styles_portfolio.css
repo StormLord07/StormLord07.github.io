@@ -51,15 +51,24 @@ a:hover {
 }
 
 /*---*/
-
+/*
 .project-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 20px;
     padding: 20px;
+}*/
+.project-grid {
+    display: flex;
+    flex-wrap: wrap;
+    /* Allows flex items to wrap onto next line */
+    gap: 20px;
+    padding: 20px;
 }
 
 .project-box {
+    flex-basis: calc(50% - 20px);
+    box-sizing: border-box;
     position: relative;
     text-decoration: none;
     color: inherit;
@@ -74,6 +83,22 @@ a:hover {
     display: flex;
     word-wrap: break-word;
     flex-direction: column;
+}
+
+/* Medium devices (tablets, 768px and up) */
+@media (min-width: 768px) {
+    .project-box {
+        flex-basis: calc(33.333% - 20px);
+        /* 3 items per row */
+    }
+}
+
+/* Large devices (desktops, 1024px and up) */
+@media (min-width: 1024px) {
+    .project-box {
+        flex-basis: calc(25% - 20px);
+        /* 4 items per row */
+    }
 }
 
 .project-box:hover {
